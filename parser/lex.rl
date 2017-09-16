@@ -22,7 +22,7 @@
 * SOFTWARE.
 */
 
-package main
+package parser
 
 
 import (
@@ -45,7 +45,7 @@ type lexer struct {
 }
 
 
-func newLexer(data []byte) *lexer {
+func NewLexer(data []byte) *lexer {
     lex := &lexer{ 
         data: data,
         pe: len(data),

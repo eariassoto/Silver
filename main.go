@@ -29,10 +29,11 @@ import (
 	"io"
 	"log"
 	"os"
+	"github.com/eariassoto/Silver/parser"
 )
 
-//go:generate ragel -Z -G2 -o lex.go lex.rl
-//go:generate goyacc parser.y
+//go:generate ragel -Z -G2 -o parser/lex.go parser/lex.rl
+//go:generate goyacc -o parser/parser.go -v parser/y.output parser/parser.y
 func main() {
 	in := bufio.NewReader(os.Stdin)
 	for {
@@ -47,7 +48,7 @@ func main() {
 			log.Fatalf("ReadBytes: %s", err)
 		}
 
-		lex := newLexer([]byte(line))
-		yyParse(lex)
+		lex := parser.NewLexer([]byte(line))
+		parser.Parse(lex)
 	}
 }

@@ -23,12 +23,16 @@
 */
 
 %{
-package main
+package parser
 
 import (
 	"math/big"
     "fmt"
 )
+
+func Parse(lex *lexer) {
+	yyParse(lex)
+}
 %}
 
 %union {
