@@ -36,12 +36,16 @@ func Parse(lex *lexer) {
 %}
 
 %union {
-   strTok *string
-   numTok *big.Rat
+   strTok  *string
+   numTok  *big.Rat
+   boolTok bool
 }
 
 %token <strTok> STRING
 %token <numTok> NUMBER
+%token <strTok> UUID
+%token <boolTok> TRUE
+%token <boolTok> FALSE
 
 %token
 LPAREN
@@ -87,8 +91,10 @@ MUT_INS
 MUT_DEL
 
 STRING
-STRING
 NUMBER
+UUID
+TRUE
+FALSE
 %%
 
 program : program operation SEMICOLON
@@ -176,6 +182,9 @@ value : atom
 // TODO add the others
 atom : STRING
      | NUMBER
+	 | UUID
+	 | TRUE
+	 | FALSE
 
 composed : LCURLY RCURLY
          | LBRACE RBRACE

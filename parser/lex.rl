@@ -74,6 +74,11 @@ func (lex *lexer) Lex(out *yySymType) int {
 				tok = NUMBER;
 				fbreak;
 			};
+			'\"'./[0-9A-Fa-f]/{8}.'-'./[0-9A-Fa-f]/{4}.'-'./[0-9A-Fa-f]/{4}.'-'./[0-9A-Fa-f]/{4}.'-'./[0-9A-Fa-f]/{12}.'\"' => {
+				str := string(lex.data[lex.ts:lex.te])
+				out.strTok = &str
+				tok = UUID; fbreak;
+			};
 			'\(' => { tok = LPAREN; fbreak;};
 			'\)' => { tok = RPAREN; fbreak;};
 			'\[' => { tok = LBRACE; fbreak;};
@@ -105,6 +110,14 @@ func (lex *lexer) Lex(out *yySymType) int {
 			'where' => { tok = WHERE; fbreak;};
 			'and' => { tok = AND; fbreak;};
 			'or' => { tok = OR; fbreak;};
+			'true' => {
+				out.boolTok = true
+				tok = TRUE; fbreak;
+			};
+			'false' => {
+				out.boolTok = false
+				tok = TRUE; fbreak;
+			};
 			'\"insert\"' => { tok = MUT_INS; fbreak;};
 			'\"delete\"' => { tok = MUT_DEL; fbreak;};
 			'\"includes\"' => { tok = INCLUDES; fbreak;};

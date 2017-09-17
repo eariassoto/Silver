@@ -1,4 +1,4 @@
-lex.go
-y.output
-y.go
+parser/lex.go
+parser/y.output
+parser/parser.go
 Silver
