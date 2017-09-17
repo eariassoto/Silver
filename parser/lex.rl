@@ -77,6 +77,7 @@ func (lex *lexer) Lex(out *yySymType) int {
 			'\"'./[0-9A-Fa-f]/{8}.'-'./[0-9A-Fa-f]/{4}.'-'./[0-9A-Fa-f]/{4}.'-'./[0-9A-Fa-f]/{4}.'-'./[0-9A-Fa-f]/{12}.'\"' => {
 				str := string(lex.data[lex.ts:lex.te])
 				out.strTok = &str
+				fmt.Printf("got a UUID %s\n", str)
 				tok = UUID; fbreak;
 			};
 			'\(' => { tok = LPAREN; fbreak;};
@@ -122,9 +123,17 @@ func (lex *lexer) Lex(out *yySymType) int {
 			'\"delete\"' => { tok = MUT_DEL; fbreak;};
 			'\"includes\"' => { tok = INCLUDES; fbreak;};
 			'\"excludes\"' => { tok = EXCLUDES; fbreak;};
+			'\"'./[a-zA-Z_][a-zA-Z_0-9]*/.'\"' => {
+				str := string(lex.data[lex.ts:lex.te])
+				out.strTok = &str
+				fmt.Printf("got an ID %s\n", str)
+				tok = ID;
+				fbreak;
+			};
 			'\"'.(any -- '\"')*.'\"' => {
 				str := string(lex.data[lex.ts:lex.te])
 				out.strTok = &str
+				fmt.Printf("got a STRING %s\n", str)
 				tok = STRING;
 				fbreak;
 			};

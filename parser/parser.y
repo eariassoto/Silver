@@ -42,6 +42,7 @@ func Parse(lex *lexer) {
 }
 
 %token <strTok> STRING
+%token <strTok> ID
 %token <numTok> NUMBER
 %token <strTok> UUID
 %token <boolTok> TRUE
@@ -91,6 +92,7 @@ MUT_INS
 MUT_DEL
 
 STRING
+ID
 NUMBER
 UUID
 TRUE
@@ -112,44 +114,44 @@ insert : base_insert
        | base_insert named
 
 base_insert :
-    INSERT INTO STRING LPAREN columns RPAREN VALUES LPAREN valueslist RPAREN
+    INSERT INTO ID LPAREN columns RPAREN VALUES LPAREN valueslist RPAREN
 
-named : NAMED STRING
+named : NAMED ID
 
 // select
 select : base_select
        | base_select where
 
-base_select : SELECT STAR FROM STRING
-            | SELECT columns FROM STRING
+base_select : SELECT STAR FROM ID
+            | SELECT columns FROM ID
 
 // update
-update : UPDATE STRING SET assignments
-       | UPDATE STRING SET assignments where
+update : UPDATE ID SET assignments
+       | UPDATE ID SET assignments where
 
 // mutate
-mutate : MUTATE STRING APPLY mutations
-       | UPDATE STRING APPLY mutations where
+mutate : MUTATE ID APPLY mutations
+       | MUTATE ID APPLY mutations where
 
 // delete
-delete : DELETE STRING
-       | DELETE STRING where
+delete : DELETE ID
+       | DELETE ID where
 
 
 assignments : assignment COMMA assignments
             | assignment
 
-assignment : STRING EQUALS value
+assignment : ID EQUALS value
 
-columns : STRING COMMA columns
-        | STRING
+columns : ID COMMA columns
+        | ID
 
 where : WHERE conditions
 
 conditions : condition COMMA conditions
            | condition
 
-condition : STRING function value
+condition : ID function value
 
 function : LE
          | LT
@@ -163,7 +165,7 @@ function : LE
 mutations : mutation COMMA mutations
           | mutation
 
-mutation : STRING mutator value
+mutation : ID mutator value
 
 mutator : INCR
         | DECR
@@ -181,6 +183,7 @@ value : atom
 
 // TODO add the others
 atom : STRING
+     | ID
      | NUMBER
 	 | UUID
 	 | TRUE
