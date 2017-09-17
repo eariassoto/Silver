@@ -26,10 +26,10 @@ package main
 
 import (
 	"bufio"
+	"github.com/eariassoto/Silver/parser"
 	"io"
 	"log"
 	"os"
-	"github.com/eariassoto/Silver/parser"
 )
 
 //go:generate ragel -Z -G2 -o parser/lex.go parser/lex.rl
@@ -37,7 +37,7 @@ import (
 func main() {
 	in := bufio.NewReader(os.Stdin)
 	for {
-		if _, err := os.Stdout.WriteString("SilverLang> "); err != nil {
+		if _, err := os.Stdout.WriteString("Silver> "); err != nil {
 			log.Fatalf("WriteString: %s", err)
 		}
 		line, err := in.ReadBytes('\n')

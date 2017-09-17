@@ -26,41 +26,25 @@ package sql2ovs
 
 import (
 	"container/list"
-	"math/big"
+	"github.com/eariassoto/Silver/errors"
 )
 
-type Printable interface {
-	Print() string
+func NewInsert(table *string, col *list.List, val *list.List) (*Insert, error) {
+	if col.Len() != val.Len() {
+		return nil, errors.New("Mismatch between column names and values.")
+	}
+	return &Insert{table, col, val, nil}, nil
 }
 
-type StringValue struct {
-	Value *string
+func NewNamedInsert(table *string, col *list.List, val *list.List, name *string) (*Insert, error) {
+	ins, err := NewInsert(table, col, val)
+	if err != nil {
+		return nil, err
+	}
+	ins.UUIDName = name
+	return ins, nil
 }
 
-type NumericValue struct {
-	Value *big.Rat
-}
-
-type BoolValue struct {
-	Value bool
-}
-
-type KeyValue struct {
-	Key   *Printable
-	Value *Printable
-}
-
-type Map struct {
-	Values *list.List
-}
-
-type Set struct {
-	Values *list.List
-}
-
-type Insert struct {
-	Table    *string
-	Columns  *list.List
-	Values   *list.List
-	UUIDName *string
+func (i *Insert) SetUUIDName(name *string) {
+	i.UUIDName = name
 }

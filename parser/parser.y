@@ -26,8 +26,10 @@
 package parser
 
 import (
-	"math/big"
+	"container/list"
     "fmt"
+	"math/big"
+	"github.com/eariassoto/Silver/sql2ovs"
 )
 
 func Parse(lex *lexer) {
@@ -36,17 +38,12 @@ func Parse(lex *lexer) {
 %}
 
 %union {
-   strTok  *string
-   numTok  *big.Rat
-   boolTok bool
+   strTok   *string
+   numTok   *big.Rat
+   boolTok  bool
+   listTok  *list.List
+   valueTok sql2ovs.Printable
 }
-
-%token <strTok> STRING
-%token <strTok> ID
-%token <numTok> NUMBER
-%token <strTok> UUID
-%token <boolTok> TRUE
-%token <boolTok> FALSE
 
 %token
 LPAREN
@@ -97,6 +94,26 @@ NUMBER
 UUID
 TRUE
 FALSE
+
+%token <strTok>  STRING
+%token <strTok>  ID
+%token <numTok>  NUMBER
+%token <strTok>  UUID
+%token <boolTok> TRUE
+%token <boolTok> FALSE
+
+%type <listTok>  columns
+%type <listTok>  valueslist
+%type <listTok>  atoms
+%type <listTok>  keyvalues
+%type <valueTok> atom
+%type <valueTok> value
+%type <valueTok> insert
+%type <valueTok> keyvalue
+%type <valueTok> composed
+%type <strTok>   stringAtom
+%type <boolTok>  boolAtom
+
 %%
 
 program : program operation SEMICOLON
@@ -110,13 +127,30 @@ operation : insert
           | delete
 
 // insert
-insert : base_insert
-       | base_insert named
-
-base_insert :
+insert :
     INSERT INTO ID LPAREN columns RPAREN VALUES LPAREN valueslist RPAREN
+{
+	// TODO errors should be handled up to the last reduction
+	insert, err := sql2ovs.NewInsert($3, $5, $9)
+	if err != nil {
+		fmt.Printf("Error: %s", err.Error())
+	} else {
+		$$ = insert
+		fmt.Printf("%s\n", $$.Print())
+	}
+};
 
-named : NAMED ID
+insert :
+    INSERT INTO ID LPAREN columns RPAREN VALUES LPAREN valueslist RPAREN NAMED ID
+{
+	insert, err := sql2ovs.NewNamedInsert($3, $5, $9, $12)
+	if err != nil {
+		fmt.Printf("Error: %s", err.Error())
+	} else {
+		$$ = insert
+		fmt.Printf("%s\n", $$.Print())
+	}
+};
 
 // select
 select : base_select
@@ -144,7 +178,18 @@ assignments : assignment COMMA assignments
 assignment : ID EQUALS value
 
 columns : ID COMMA columns
-        | ID
+{
+	l := $3
+	l.PushFront(&sql2ovs.StringValue{$1})
+	$$ = l
+};
+
+columns : ID
+{
+	l := list.New()
+	l.PushBack(&sql2ovs.StringValue{$1})
+	$$ = l
+};
 
 where : WHERE conditions
 
@@ -175,29 +220,97 @@ mutator : INCR
 		| MUT_INS
 		| MUT_DEL
 
+atoms : atom COMMA atoms
+{
+	l := $3
+	l.PushFront($1)
+	$$ = l
+};
+
+atoms : atom
+{
+	l := list.New()
+	l.PushBack($1)
+	$$ = l
+};
+
 valueslist : value COMMA valueslist
-       | value
+{
+	l := $3
+	l.PushFront($1)
+	$$ = l
+};
+
+valueslist : value
+{
+	l := list.New()
+	l.PushBack($1)
+	$$ = l
+};
 
 value : atom
       | composed
-
-// TODO add the others
-atom : STRING
-     | ID
-     | NUMBER
-	 | UUID
-	 | TRUE
-	 | FALSE
+{
+	$$ = $1
+};
 
 composed : LCURLY RCURLY
-         | LBRACE RBRACE
-         | LBRACE atoms RBRACE
-	     | LCURLY keyvalues RCURLY
+{
+	$$ = sql2ovs.NewEmptyMap()
+};
 
-atoms : atom COMMA atoms
-      | atom
+composed : LCURLY keyvalues RCURLY
+{
+	$$ = &sql2ovs.Map{$2}
+};
 
-keyvalue : atom COLON atom
+composed : LBRACE RBRACE
+{
+	$$ = sql2ovs.NewEmptySet()
+};
+
+composed : LBRACE atoms RBRACE
+{
+	$$ = &sql2ovs.Set{$2}
+};
 
 keyvalues : keyvalue COMMA keyvalues
-          | keyvalue
+{
+	l := $3
+	l.PushFront(&$1)
+	$$ = l
+};
+
+keyvalues : keyvalue
+{
+	l := list.New()
+	l.PushBack(&$1)
+	$$ = l
+};
+
+keyvalue : atom COLON atom
+{
+	$$ = &sql2ovs.KeyValue{&$1, &$3}
+};
+
+stringAtom : STRING
+           | ID
+		   | UUID
+
+atom : stringAtom
+{
+	$$ = &sql2ovs.StringValue{$1}
+};
+
+atom : NUMBER
+{
+	$$ = &sql2ovs.NumericValue{$1}
+};
+
+boolAtom : TRUE
+         | FALSE
+
+atom : boolAtom
+{
+	$$ = &sql2ovs.BoolValue{$1}
+};
