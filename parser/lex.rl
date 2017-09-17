@@ -62,7 +62,7 @@ func (lex *lexer) Lex(out *yySymType) int {
     tok := 0
     %%{ 
         main := |*
-            digit+ => {
+            ("+"|"-")?.(digit+ | digit+.".".digit+) => {
 				numStr := string(lex.data[lex.ts:lex.te])
 				out.numTok = &big.Rat{};
 				_, ok := out.numTok.SetString(numStr);
