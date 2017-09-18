@@ -29,6 +29,18 @@ import (
 	"github.com/eariassoto/Silver/errors"
 )
 
+func NewEmptyMap() *Map {
+	m := Map{}
+	m.Values = nil
+	return &m
+}
+
+func NewEmptySet() *Set {
+	s := Set{}
+	s.Values = nil
+	return &s
+}
+
 func NewInsert(table *string, col *list.List, val *list.List) (*Insert, error) {
 	if col.Len() != val.Len() {
 		return nil, errors.New("Mismatch between column names and values.")

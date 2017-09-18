@@ -46,8 +46,8 @@ type BoolValue struct {
 }
 
 type KeyValue struct {
-	Key   *Printable
-	Value *Printable
+	Key   Printable
+	Value Printable
 }
 
 type Map struct {
@@ -58,9 +58,49 @@ type Set struct {
 	Values *list.List
 }
 
+type Mutation struct {
+	ID      *string
+	Mutator Printable
+	Value   Printable
+}
+
+type Condition struct {
+	ID       *string
+	Function Printable
+	Value    Printable
+}
+
+type Assignment struct {
+	ID       *string
+	Value    Printable
+}
+
 type Insert struct {
 	Table    *string
 	Columns  *list.List
 	Values   *list.List
 	UUIDName *string
+}
+
+type Select struct {
+	Table      *string
+	Columns    *list.List
+	Conditions *list.List
+}
+
+type Update struct {
+	Table       *string
+	Assignments *list.List
+	Conditions  *list.List
+}
+
+type Mutate struct {
+	Table      *string
+	Mutations  *list.List
+	Conditions *list.List
+}
+
+type Delete struct {
+	Table      *string
+	Conditions *list.List
 }

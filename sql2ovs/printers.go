@@ -45,18 +45,6 @@ func (k *KeyValue) Print() string {
 	return fmt.Sprintf("[%s, %s]", k.Key, k.Value)
 }
 
-func NewEmptyMap() *Map {
-	m := Map{}
-	m.Values = nil
-	return &m
-}
-
-func NewEmptySet() *Set {
-	s := Set{}
-	s.Values = nil
-	return &s
-}
-
 func (m *Map) Print() string {
 	if m.Values != nil {
 		return "[\"map\", []]"
@@ -73,6 +61,18 @@ func (m *Map) Print() string {
 	}
 	str += "]]"
 	return str
+}
+
+func (m *Mutation) Print() string {
+	return fmt.Sprintf("[%s, %s, %s]", *m.ID, m.Mutator.Print(), m.Value.Print())
+}
+
+func (c *Condition) Print() string {
+	return fmt.Sprintf("[%s, %s, %s]", *c.ID, c.Function.Print(), c.Value.Print())
+}
+
+func (a *Assignment) Print() string {
+	return fmt.Sprintf("%s:%s", *a.ID, a.Value.Print())
 }
 
 func (s *Set) Print() string {
@@ -96,7 +96,6 @@ func (s *Set) Print() string {
 func (i *Insert) Print() string {
 	c := i.Columns.Front()
 	row := "{"
-	//fmt.Print(i.Values, i.Columns, i.Values.Front())
 	for v := i.Values.Front(); v != nil; v = v.Next() {
 		column := c.Value.(Printable)
 		value := v.Value.(Printable)
@@ -112,4 +111,88 @@ func (i *Insert) Print() string {
 		name = ", \"uuid-name\":" + *i.UUIDName
 	}
 	return fmt.Sprintf("{\"op\":\"insert\", \"table\":%s, \"row\":%s%s}", *i.Table, row, name)
+}
+
+func (s *Select) Print() string {
+	cols := ""
+	conds := ""
+	if s.Columns != nil {
+		cols += ", \"columns\":["
+		for c := s.Columns.Front(); c != nil; c = c.Next() {
+			column := c.Value.(Printable)
+			cols += column.Print()
+			if c.Next() != nil {
+				cols += ","
+			}
+		}
+		cols += "]"
+	}
+	if s.Conditions != nil {
+		for c := s.Conditions.Front(); c != nil; c = c.Next() {
+			condition := c.Value.(Printable)
+			conds += condition.Print()
+			if c.Next() != nil {
+				conds += ","
+			}
+		}
+	}
+	return fmt.Sprintf("{\"op\":\"select\", \"table\":%s%s, \"where\":[%s]}", *s.Table, cols, conds)
+}
+
+func (u *Update) Print() string {
+	rows := ""
+	conds := ""
+	for a := u.Assignments.Front(); a != nil; a = a.Next() {
+		assignment := a.Value.(Printable)
+		rows += assignment.Print()
+		if a.Next() != nil {
+			rows += ","
+		}
+	}
+	if u.Conditions != nil {
+		for c := u.Conditions.Front(); c != nil; c = c.Next() {
+			condition := c.Value.(Printable)
+			conds += condition.Print()
+			if c.Next() != nil {
+				conds += ","
+			}
+		}
+	}
+	return fmt.Sprintf("{\"op\":\"update\", \"table\":%s, \"where\":[%s], \"rows\":[{%s}}", *u.Table, conds, rows)
+}
+
+func (m *Mutate) Print() string {
+	muts := ""
+	conds := ""
+	for m := m.Mutations.Front(); m != nil; m = m.Next() {
+		mutation := m.Value.(Printable)
+		muts += mutation.Print()
+		if m.Next() != nil {
+			muts += ","
+		}
+	}
+	if m.Conditions != nil {
+		for c := m.Conditions.Front(); c != nil; c = c.Next() {
+			condition := c.Value.(Printable)
+			conds += condition.Print()
+			if c.Next() != nil {
+				conds += ","
+			}
+		}
+	}
+	return fmt.Sprintf("{\"op\":\"mutate\", \"table\":%s, \"where\":[%s], \"mutations\":[{%s}}", *m.Table, conds, muts)
+}
+
+func (d *Delete) Print() string {
+	conds := ""
+	if d.Conditions != nil {
+		for c := d.Conditions.Front(); c != nil; c = c.Next() {
+			condition := c.Value.(Printable)
+			conds += condition.Print()
+			if c.Next() != nil {
+				conds += ","
+			}
+		}
+	}
+	return fmt.Sprintf("{\"op\":\"delete\", \"table\":%s, \"where\":[%s]}", *d.Table, conds)
 }

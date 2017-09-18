@@ -88,12 +88,36 @@ func (lex *lexer) Lex(out *yySymType) int {
 			'\{' => { tok = LCURLY; fbreak;};
 			'\}' => { tok = RCURLY; fbreak;};
 			'=' => { tok = EQUALS; fbreak;};
-			'\"<=\"' => { tok = LE; fbreak;};
-			'\"<\"' => { tok = LT; fbreak;};
-			'\">=\"' => { tok = GE; fbreak;};
-			'\">\"' => { tok = GT; fbreak;};
-			'\"==\"' => { tok = EQ; fbreak;};
-			'\"!=\"' => { tok = NE; fbreak;};
+			'\"<=\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = LE; fbreak;
+			};
+			'\"<\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = LT; fbreak;
+			};
+			'\">=\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = GE; fbreak;
+			};
+			'\">\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = GT; fbreak;
+			};
+			'\"==\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = EQ; fbreak;
+			};
+			'\"!=\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = NE; fbreak;
+			};
 			':' => { tok = COLON; fbreak;};
 			';' => { tok = SEMICOLON; fbreak;};
 			'insert' => { tok = INSERT; fbreak;};
@@ -118,10 +142,51 @@ func (lex *lexer) Lex(out *yySymType) int {
 				out.boolTok = false
 				tok = TRUE; fbreak;
 			};
-			'\"insert\"' => { tok = MUT_INS; fbreak;};
-			'\"delete\"' => { tok = MUT_DEL; fbreak;};
-			'\"includes\"' => { tok = INCLUDES; fbreak;};
-			'\"excludes\"' => { tok = EXCLUDES; fbreak;};
+			'\"+=\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = INCR; fbreak;
+			};
+			'\"-=\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = DECR; fbreak;
+			};
+			'\"*=\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = MULT; fbreak;
+			};
+			'\"/=\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = DIV; fbreak;
+			};
+			'\"%/\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = MOD; fbreak;
+			};
+			'\"insert\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = MUT_INS; fbreak;
+			};
+			'\"delete\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = MUT_DEL; fbreak;
+			};
+			'\"includes\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = INCLUDES; fbreak;
+			};
+			'\"excludes\"' => {
+				str := string(lex.data[lex.ts:lex.te])	
+				out.strTok = &str
+				tok = EXCLUDES; fbreak;
+			};
 			'\"'./[a-zA-Z_][a-zA-Z_0-9]*/.'\"' => {
 				str := string(lex.data[lex.ts:lex.te])
 				out.strTok = &str

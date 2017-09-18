@@ -101,14 +101,41 @@ FALSE
 %token <strTok>  UUID
 %token <boolTok> TRUE
 %token <boolTok> FALSE
+%token <strTok>  INCR
+%token <strTok>  DECR
+%token <strTok>  MULT
+%token <strTok>  DIV
+%token <strTok>  MOD
+%token <strTok>  MUT_INS
+%token <strTok>  MUT_DEL
+%token <strTok>  LE
+%token <strTok>  LT
+%token <strTok>  GE
+%token <strTok>  GT
+%token <strTok>  EQ
+%token <strTok>  NE
+%token <strTok>  INCLUDES
+%token <strTok>  EXCLUDES
 
+%type <listTok>  mutations
+%type <listTok>  assignments
+%type <listTok>  conditions
 %type <listTok>  columns
 %type <listTok>  valueslist
 %type <listTok>  atoms
 %type <listTok>  keyvalues
+%type <valueTok> function
+%type <valueTok> assignment
+%type <valueTok> condition
+%type <valueTok> mutation
 %type <valueTok> atom
 %type <valueTok> value
+%type <valueTok> select
+%type <valueTok> update
+%type <valueTok> delete
+%type <valueTok> mutate
 %type <valueTok> insert
+%type <valueTok> mutator
 %type <valueTok> keyvalue
 %type <valueTok> composed
 %type <strTok>   stringAtom
@@ -118,7 +145,6 @@ FALSE
 
 program : program operation SEMICOLON
         | operation SEMICOLON
-	{ fmt.Println("Got a valid SQL operation") }
 
 operation : insert
           | select
@@ -153,29 +179,97 @@ insert :
 };
 
 // select
-select : base_select
-       | base_select where
+select : SELECT columns FROM ID
+{
+	sel := &sql2ovs.Select{$4, $2, nil}
+	fmt.Printf("%s\n", sel.Print())
+	$$ = sel
+};
 
-base_select : SELECT STAR FROM ID
-            | SELECT columns FROM ID
+select : SELECT columns FROM ID WHERE conditions
+{
+	sel := &sql2ovs.Select{$4, $2, $6}
+	fmt.Printf("%s\n", sel.Print())
+	$$ = sel
+};
+
+select : SELECT STAR FROM ID
+{
+	sel := &sql2ovs.Select{$4, nil, nil}
+	fmt.Printf("%s\n", sel.Print())
+	$$ = sel
+};
+
+select : SELECT STAR FROM ID WHERE conditions
+{
+	sel := &sql2ovs.Select{$4, nil, $6}
+	fmt.Printf("%s\n", sel.Print())
+	$$ = sel
+};
 
 // update
 update : UPDATE ID SET assignments
-       | UPDATE ID SET assignments where
+{
+	upd := &sql2ovs.Update{$2, $4, nil}
+	fmt.Printf("%s\n", upd.Print())
+	$$ = upd
+};
+
+update : UPDATE ID SET assignments WHERE conditions
+{
+	upd := &sql2ovs.Update{$2, $4, $6}
+	fmt.Printf("%s\n", upd.Print())
+	$$ = upd
+};
 
 // mutate
 mutate : MUTATE ID APPLY mutations
-       | MUTATE ID APPLY mutations where
+{
+	mut := &sql2ovs.Mutate{$2, $4, nil}
+	fmt.Printf("%s\n", mut.Print())
+	$$ = mut
+};
+
+mutate : MUTATE ID APPLY mutations WHERE conditions
+{
+	mut := &sql2ovs.Mutate{$2, $4, $6}
+	fmt.Printf("%s\n", mut.Print())
+	$$ = mut
+};
 
 // delete
 delete : DELETE ID
-       | DELETE ID where
+{
+	del := &sql2ovs.Delete{$2, nil}
+	fmt.Printf("%s\n", del.Print())
+	$$ = del
+};
 
+delete : DELETE ID WHERE conditions
+{
+	del := &sql2ovs.Delete{$2, $4}
+	fmt.Printf("%s\n", del.Print())
+	$$ = del
+};
 
 assignments : assignment COMMA assignments
-            | assignment
+{
+	l := $3
+	l.PushFront($1)
+	$$ = l
+};
+
+assignments : assignment
+{
+	l := list.New()
+	l.PushBack($1)
+	$$ = l
+};
 
 assignment : ID EQUALS value
+{
+	$$ = &sql2ovs.Assignment{$1, $3}
+};
 
 columns : ID COMMA columns
 {
@@ -191,34 +285,60 @@ columns : ID
 	$$ = l
 };
 
-where : WHERE conditions
-
 conditions : condition COMMA conditions
-           | condition
+{
+	l := $3
+	l.PushFront($1)
+	$$ = l
+};
+
+conditions : condition
+{
+	l := list.New()
+	l.PushBack($1)
+	$$ = l
+};
 
 condition : ID function value
+{
+	$$ = &sql2ovs.Condition{$1, $2, $3}
+};
 
-function : LE
-         | LT
-         | GE
-         | GT
-         | EQ
-         | NE
-	     | INCLUDES
-	     | EXCLUDES
+function : LE { $$ = &sql2ovs.StringValue{$1} };
+function : LT { $$ = &sql2ovs.StringValue{$1} };
+function : GE { $$ = &sql2ovs.StringValue{$1} };
+function : GT { $$ = &sql2ovs.StringValue{$1} };
+function : EQ { $$ = &sql2ovs.StringValue{$1} };
+function : NE { $$ = &sql2ovs.StringValue{$1} };
+function : INCLUDES { $$ = &sql2ovs.StringValue{$1} };
+function : EXCLUDES { $$ = &sql2ovs.StringValue{$1} };
 
 mutations : mutation COMMA mutations
-          | mutation
+{
+	l := $3
+	l.PushFront($1)
+	$$ = l
+};
+
+mutations : mutation
+{
+	l := list.New()
+	l.PushBack($1)
+	$$ = l
+};
 
 mutation : ID mutator value
+{
+	$$ = &sql2ovs.Mutation{$1, $2, $3}
+};
 
-mutator : INCR
-        | DECR
-		| MULT
-		| DIV
-		| MOD
-		| MUT_INS
-		| MUT_DEL
+mutator : INCR { $$ = &sql2ovs.StringValue{$1} };
+mutator : DECR { $$ = &sql2ovs.StringValue{$1} };
+mutator : MULT { $$ = &sql2ovs.StringValue{$1} };
+mutator : DIV { $$ = &sql2ovs.StringValue{$1} };
+mutator : MOD { $$ = &sql2ovs.StringValue{$1} };
+mutator : MUT_INS { $$ = &sql2ovs.StringValue{$1} };
+mutator : MUT_DEL { $$ = &sql2ovs.StringValue{$1} };
 
 atoms : atom COMMA atoms
 {
@@ -290,7 +410,7 @@ keyvalues : keyvalue
 
 keyvalue : atom COLON atom
 {
-	$$ = &sql2ovs.KeyValue{&$1, &$3}
+	$$ = &sql2ovs.KeyValue{$1, $3}
 };
 
 stringAtom : STRING
