@@ -71,8 +71,8 @@ type Condition struct {
 }
 
 type Assignment struct {
-	ID       *string
-	Value    Printable
+	ID    *string
+	Value Printable
 }
 
 type Insert struct {

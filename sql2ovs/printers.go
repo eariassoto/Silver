@@ -42,21 +42,19 @@ func (b *BoolValue) Print() string {
 }
 
 func (k *KeyValue) Print() string {
-	return fmt.Sprintf("[%s, %s]", k.Key, k.Value)
+	return fmt.Sprintf("[%s, %s]", k.Key.Print(), k.Value.Print())
 }
 
 func (m *Map) Print() string {
-	if m.Values != nil {
+	if m.Values == nil {
 		return "[\"map\", []]"
 	}
 	str := "[\"map\", ["
-	for e := m.Values.Front(); m.Values != nil; e = e.Next() {
-		value, ok := e.Value.(Printable)
-		if ok {
-			str += value.Print()
-			if e.Next() != nil {
-				str += ","
-			}
+	for e := m.Values.Front(); e != nil; e = e.Next() {
+		value := e.Value.(Printable)
+		str += value.Print()
+		if e.Next() != nil {
+			str += ","
 		}
 	}
 	str += "]]"
