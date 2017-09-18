@@ -162,7 +162,7 @@ insert :
 		fmt.Printf("Error: %s", err.Error())
 	} else {
 		$$ = insert
-		fmt.Printf("%s\n", $$.Print())
+		fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 	}
 };
 
@@ -174,7 +174,7 @@ insert :
 		fmt.Printf("Error: %s", err.Error())
 	} else {
 		$$ = insert
-		fmt.Printf("%s\n", $$.Print())
+		fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 	}
 };
 
@@ -182,74 +182,74 @@ insert :
 select : SELECT columns FROM ID
 {
 	sel := &sql2ovs.Select{$4, $2, nil}
-	fmt.Printf("%s\n", sel.Print())
 	$$ = sel
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 select : SELECT columns FROM ID WHERE conditions
 {
 	sel := &sql2ovs.Select{$4, $2, $6}
-	fmt.Printf("%s\n", sel.Print())
 	$$ = sel
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 select : SELECT STAR FROM ID
 {
 	sel := &sql2ovs.Select{$4, nil, nil}
-	fmt.Printf("%s\n", sel.Print())
 	$$ = sel
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 select : SELECT STAR FROM ID WHERE conditions
 {
 	sel := &sql2ovs.Select{$4, nil, $6}
-	fmt.Printf("%s\n", sel.Print())
 	$$ = sel
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 // update
 update : UPDATE ID SET assignments
 {
 	upd := &sql2ovs.Update{$2, $4, nil}
-	fmt.Printf("%s\n", upd.Print())
 	$$ = upd
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 update : UPDATE ID SET assignments WHERE conditions
 {
 	upd := &sql2ovs.Update{$2, $4, $6}
-	fmt.Printf("%s\n", upd.Print())
 	$$ = upd
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 // mutate
 mutate : MUTATE ID APPLY mutations
 {
 	mut := &sql2ovs.Mutate{$2, $4, nil}
-	fmt.Printf("%s\n", mut.Print())
 	$$ = mut
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 mutate : MUTATE ID APPLY mutations WHERE conditions
 {
 	mut := &sql2ovs.Mutate{$2, $4, $6}
-	fmt.Printf("%s\n", mut.Print())
 	$$ = mut
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 // delete
 delete : DELETE ID
 {
 	del := &sql2ovs.Delete{$2, nil}
-	fmt.Printf("%s\n", del.Print())
 	$$ = del
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 delete : DELETE ID WHERE conditions
 {
 	del := &sql2ovs.Delete{$2, $4}
-	fmt.Printf("%s\n", del.Print())
 	$$ = del
+	fmt.Printf("ovsdb-client transact '[\"OpenSwitch\", %s]'\n", $$.Print())
 };
 
 assignments : assignment COMMA assignments
@@ -397,14 +397,14 @@ composed : LBRACE atoms RBRACE
 keyvalues : keyvalue COMMA keyvalues
 {
 	l := $3
-	l.PushFront(&$1)
+	l.PushFront($1)
 	$$ = l
 };
 
 keyvalues : keyvalue
 {
 	l := list.New()
-	l.PushBack(&$1)
+	l.PushBack($1)
 	$$ = l
 };
 
