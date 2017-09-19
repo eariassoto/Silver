@@ -30,9 +30,14 @@ An `<id>` to name the uuid of a "insert" operation within the same transaction.
 + `<atom>`
 
 A value that represents a scalar value for a column, one of `<string>`, `<number>`, `<boolean>`, `<uuid>`, or `<named-uuid>`.
+
 + `<function>`
 
-One of `"<"`, `"<="`, `"=="`, `"!="`, `">="`, `">"`, `"includes"`, or `"excludes"`.
+One of `<`, `<=`, `==`, `!=`, `>=`, `>`, `includes`, or `excludes`.
+
++ `<mutation>`
+
+One of `+=`, `-=`, `*=`, `/=`, `%=`, `add`, or `remove`.
 
 + `<set>`
 
@@ -64,7 +69,11 @@ A comma separated list of one or more `<value>`. Example: `1, "chair", {"color":
 
 + `<assignments>`
 
-A comma separated list representing changes for columns. An assigment has this format: `<column> = <value>`. Example: `"color"="red", "price":500, "discount": true`
+A comma separated list representing changes for columns. An assigment has this format: `<column> = <value>`. Example: `"color" = "red", "price" = 500, "discount" = true`
+
++ `<mutations>`
+
+A comma separated list representing mutation for columns. An assigment has this format: `<column> <mutation> <value>`. Example: `"price" += 200, "discount" -= 0.1`
 
 + `<conditions>`
 
@@ -98,10 +107,10 @@ UPDATE <table> SET <assignment> WHERE <condition>;
 
 ### 4. Mutate
 ```
-MUTATE <table> APPLY <assignments>;
+MUTATE <table> APPLY <mutations>;
 ```
 ```
-MUTATE <table> APPLY <assignments> WHERE <conditions>;
+MUTATE <table> APPLY <mutation> WHERE <conditions>;
 ```
 
 ### 5. Delete
