@@ -304,6 +304,26 @@ condition : ID function value
 	$$ = &sql2ovs.Condition{$1, $2, $3}
 };
 
+// new condition to make map conditions easier
+// Example: where "myMap":"key1" == "value1"
+condition : ID COLON ID EQ atom
+{
+    condStr := string("includes")
+    cond := &sql2ovs.StringValue{&condStr}
+    key := &sql2ovs.StringValue{$3}
+    keyval := &sql2ovs.KeyValue{key, $5}
+	$$ = &sql2ovs.Condition{$1, cond, keyval}
+};
+
+condition : ID COLON ID NE atom
+{
+    condStr := string("excludes")
+    cond := &sql2ovs.StringValue{&condStr}
+    key := &sql2ovs.StringValue{$3}
+    keyval := &sql2ovs.KeyValue{key, $5}
+	$$ = &sql2ovs.Condition{$1, cond, keyval}
+};
+
 function : LE { $$ = &sql2ovs.StringValue{$1} };
 function : LT { $$ = &sql2ovs.StringValue{$1} };
 function : GE { $$ = &sql2ovs.StringValue{$1} };
@@ -337,8 +357,14 @@ mutator : DECR { $$ = &sql2ovs.StringValue{$1} };
 mutator : MULT { $$ = &sql2ovs.StringValue{$1} };
 mutator : DIV { $$ = &sql2ovs.StringValue{$1} };
 mutator : MOD { $$ = &sql2ovs.StringValue{$1} };
-mutator : ADD { $$ = &sql2ovs.StringValue{"insert"} };
-mutator : REMOVE { $$ = &sql2ovs.StringValue{"delete"} };
+mutator : ADD {
+    str := string("\"insert\"")
+    $$ = &sql2ovs.StringValue{&str}
+};
+mutator : REMOVE {
+    str := string("\"delete\"")
+    $$ = &sql2ovs.StringValue{&str}
+};
 
 atoms : atom COMMA atoms
 {
