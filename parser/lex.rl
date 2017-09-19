@@ -120,25 +120,25 @@ func (lex *lexer) Lex(out *yySymType) int {
 			};
 			':' => { tok = COLON; fbreak;};
 			';' => { tok = SEMICOLON; fbreak;};
-			'insert' => { tok = INSERT; fbreak;};
-			'into' => { tok = INTO; fbreak;};
-			'values' => { tok = VALUES; fbreak;};
-			'named' => { tok = NAMED; fbreak;};
-			'select' => { tok = SELECT; fbreak;};
-			'from' => { tok = FROM; fbreak;};
-			'update' => { tok = UPDATE; fbreak;};
-			'mutate' => { tok = MUTATE; fbreak;};
-			'apply' => { tok = APPLY; fbreak;};
-			'set' => { tok = SET; fbreak;};
-			'delete' => { tok = DELETE; fbreak;};
-			'where' => { tok = WHERE; fbreak;};
-			'and' => { tok = AND; fbreak;};
-			'or' => { tok = OR; fbreak;};
-			'true' => {
+			'insert'i => { tok = INSERT; fbreak;};
+			'into'i => { tok = INTO; fbreak;};
+			'values'i => { tok = VALUES; fbreak;};
+			'named'i => { tok = NAMED; fbreak;};
+			'select'i => { tok = SELECT; fbreak;};
+			'from'i => { tok = FROM; fbreak;};
+			'update'i => { tok = UPDATE; fbreak;};
+			'mutate'i => { tok = MUTATE; fbreak;};
+			'apply'i => { tok = APPLY; fbreak;};
+			'set'i => { tok = SET; fbreak;};
+			'delete'i => { tok = DELETE; fbreak;};
+			'where'i => { tok = WHERE; fbreak;};
+			'and'i => { tok = AND; fbreak;};
+			'or'i => { tok = OR; fbreak;};
+			'true'i => {
 				out.boolTok = true
 				tok = TRUE; fbreak;
 			};
-			'false' => {
+			'false'i => {
 				out.boolTok = false
 				tok = TRUE; fbreak;
 			};
@@ -167,18 +167,18 @@ func (lex *lexer) Lex(out *yySymType) int {
 				out.strTok = &str
 				tok = MOD; fbreak;
 			};
-			'add' => {
+			'add'i => {
 				tok = ADD; fbreak;
 			};
-			'remove' => {
+			'remove'i => {
 				tok = REMOVE; fbreak;
 			};
-			'includes' => {
+			'includes'i => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = INCLUDES; fbreak;
 			};
-			'excludes' => {
+			'excludes'i => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = EXCLUDES; fbreak;
