@@ -66,7 +66,7 @@ func (m *Mutation) Print() string {
 }
 
 func (c *Condition) Print() string {
-	return fmt.Sprintf("[%s, %s, %s]", *c.ID, c.Function.Print(), c.Value.Print())
+	return fmt.Sprintf("[%s, \"%s\", %s]", *c.ID, c.Function.Print(), c.Value.Print())
 }
 
 func (a *Assignment) Print() string {

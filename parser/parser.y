@@ -85,8 +85,8 @@ AND
 OR
 INCLUDES
 EXCLUDES
-MUT_INS
-MUT_DEL
+ADD
+REMOVE
 
 STRING
 ID
@@ -106,8 +106,8 @@ FALSE
 %token <strTok>  MULT
 %token <strTok>  DIV
 %token <strTok>  MOD
-%token <strTok>  MUT_INS
-%token <strTok>  MUT_DEL
+%token <strTok>  ADD
+%token <strTok>  REMOVE
 %token <strTok>  LE
 %token <strTok>  LT
 %token <strTok>  GE
@@ -337,8 +337,8 @@ mutator : DECR { $$ = &sql2ovs.StringValue{$1} };
 mutator : MULT { $$ = &sql2ovs.StringValue{$1} };
 mutator : DIV { $$ = &sql2ovs.StringValue{$1} };
 mutator : MOD { $$ = &sql2ovs.StringValue{$1} };
-mutator : MUT_INS { $$ = &sql2ovs.StringValue{$1} };
-mutator : MUT_DEL { $$ = &sql2ovs.StringValue{$1} };
+mutator : ADD { $$ = &sql2ovs.StringValue{"insert"} };
+mutator : REMOVE { $$ = &sql2ovs.StringValue{"delete"} };
 
 atoms : atom COMMA atoms
 {

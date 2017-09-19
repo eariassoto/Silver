@@ -88,32 +88,32 @@ func (lex *lexer) Lex(out *yySymType) int {
 			'\{' => { tok = LCURLY; fbreak;};
 			'\}' => { tok = RCURLY; fbreak;};
 			'=' => { tok = EQUALS; fbreak;};
-			'\"<=\"' => {
+			'<=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = LE; fbreak;
 			};
-			'\"<\"' => {
+			'<' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = LT; fbreak;
 			};
-			'\">=\"' => {
+			'>=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = GE; fbreak;
 			};
-			'\">\"' => {
+			'>' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = GT; fbreak;
 			};
-			'\"==\"' => {
+			'==' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = EQ; fbreak;
 			};
-			'\"!=\"' => {
+			'!=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = NE; fbreak;
@@ -142,47 +142,43 @@ func (lex *lexer) Lex(out *yySymType) int {
 				out.boolTok = false
 				tok = TRUE; fbreak;
 			};
-			'\"+=\"' => {
+			'+=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = INCR; fbreak;
 			};
-			'\"-=\"' => {
+			'-=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = DECR; fbreak;
 			};
-			'\"*=\"' => {
+			'*=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = MULT; fbreak;
 			};
-			'\"/=\"' => {
+			'/=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = DIV; fbreak;
 			};
-			'\"%/\"' => {
+			'%=' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = MOD; fbreak;
 			};
-			'\"insert\"' => {
-				str := string(lex.data[lex.ts:lex.te])	
-				out.strTok = &str
-				tok = MUT_INS; fbreak;
+			'add' => {
+				tok = ADD; fbreak;
 			};
-			'\"delete\"' => {
-				str := string(lex.data[lex.ts:lex.te])	
-				out.strTok = &str
-				tok = MUT_DEL; fbreak;
+			'remove' => {
+				tok = REMOVE; fbreak;
 			};
-			'\"includes\"' => {
+			'includes' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = INCLUDES; fbreak;
 			};
-			'\"excludes\"' => {
+			'excludes' => {
 				str := string(lex.data[lex.ts:lex.te])	
 				out.strTok = &str
 				tok = EXCLUDES; fbreak;
