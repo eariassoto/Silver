@@ -33,6 +33,10 @@ func (s *StringValue) Print() string {
 	return *s.Value
 }
 
+func (s *UuidValue) Print() string {
+	return fmt.Sprintf("[\"uuid\", %s]", *s.Value)
+}
+
 func (n *NumericValue) Print() string {
 	return n.Value.RatString()
 }

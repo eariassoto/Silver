@@ -441,11 +441,15 @@ keyvalue : atom COLON atom
 
 stringAtom : STRING
            | ID
-		   | UUID
 
 atom : stringAtom
 {
 	$$ = &sql2ovs.StringValue{$1}
+};
+
+atom : UUID
+{
+	$$ = &sql2ovs.UuidValue{$1}
 };
 
 atom : NUMBER

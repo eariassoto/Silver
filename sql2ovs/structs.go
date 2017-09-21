@@ -37,6 +37,10 @@ type StringValue struct {
 	Value *string
 }
 
+type UuidValue struct {
+	Value *string
+}
+
 type NumericValue struct {
 	Value *big.Rat
 }
