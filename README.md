@@ -77,7 +77,7 @@ A comma separated list representing mutation for columns. An assigment has this 
 
 + `<conditions>`
 
-A comma separated list of conditions to be evaluated. A condition has this format: `<column> <function> <value>`. Example: `"color" "==" "blue", "price" "<" 300`
+A comma separated list of conditions to be evaluated. A condition has this format: `<column> <function> <value>`. Example: `"color" == "blue", "price" < 300`
 
 ## Database operations
 ### 1. Insert
